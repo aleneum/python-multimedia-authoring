@@ -43,6 +43,8 @@ class SoundControl(object):
         self._rain = Sound("%s/rain.wav" % data_folder)
         self._thunder = 0
         self._last = 0
+        self.lightning.set_B(ON)
+        self.lightning.send()
 
     def rain(self):
         self._rain.play(-1)
@@ -53,11 +55,12 @@ class SoundControl(object):
     # 0 - 6
     def thunder(self, inc):
         wait = random.randint(0, 2+inc)
+
         while (self._last == wait):
             wait = random.randint(0, 2+inc)
 
         self._last = wait
-        print wait
+        print "intensity:", wait
         thunder = Sound("%s/thunder_0%d.wav" % (self._data_folder, wait))
         if wait < 6:
             self.lightning.set_C(ON)
@@ -67,25 +70,40 @@ class SoundControl(object):
             self.lightning.send()
             time.sleep(wait)
 
+        if wait < 6:
+            print "send"
+            self.lightning.set_B(OFF)
+            self.lightning.send()
         thunder.play()
+        if wait < 6:
+            time.sleep(0.3)
+            self.lightning.set_B(ON)
+            self.lightning.send()
         time.sleep(thunder.get_length()-0.3)
         thunder.fadeout(200)
         time.sleep(wait)
 
     def devil(self):
+        self.lightning.set_B(OFF)
         self.lightning.set_C(ON)
         self.lightning.send()
         poodle = Sound("%s/poodle.wav" % (self._data_folder))
         poodle.play()
-        while True:
-            wait = random.randint(0, 8)
-            while (self._last == wait):
-                wait = random.randint(0, 8)
-            print wait
+        time.sleep(1)
+        for i in range(10):
+            wait = random.randint(0, 3)
+            while self._last == wait:
+                wait = random.randint(0, 3)
+            print "devil intensity:", wait
             self._last = wait
             thunder = Sound("%s/thunder_0%d.wav" % (self._data_folder, wait))
             thunder.play()
             time.sleep(2)
+        self.lightning.set_C(OFF)
+        self.lightning.send()
+        time.sleep(1)
+        self.lightning.set_B(ON)
+        self.lightning.send()
 
 # global constants
 FREQ = 44100   # same as audio CD
@@ -93,7 +111,7 @@ BITSIZE = -16  # unsigned 16 bit
 CHANNELS = 2   # 1 == mono, 2 == stereo
 BUFFER = 1024  # audio buffer size in no. of samples
 FRAMERATE = 30 # how often to check if playback has finished
-SERIAL_STRING='/dev/cu.usbmodem1411'
+SERIAL_STRING='/dev/cu.usbmodem1421'
 DATA_FOLDER='data'
 ON = True
 OFF = False
@@ -107,6 +125,14 @@ pygame.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
 sound = SoundControl(SERIAL_STRING, DATA_FOLDER)
 sound.rain()
 
-while(True):
-    sound.thunder(6)
-    #sound.devil()
+counter = 1
+
+while True:
+    counter %= 20
+    if counter == 0:
+        sound.devil()
+    else:
+        i = max(min(6, 20 - counter), 3)
+        sound.thunder(i)
+    counter += 1
+    print "counter: ", counter
