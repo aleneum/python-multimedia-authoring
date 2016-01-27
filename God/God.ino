@@ -48,11 +48,12 @@ void setup() {
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
+  set(SAD, SAD, SAD, HSV_BLUE);
 }
 
 void loop(){
-  set(ANGRY, ANGRY, ANGRY, HSV_RED);
-  delay(10000);
+  //set(ANGRY, ANGRY, ANGRY, HSV_RED);
+  //delay(10000);
 }
 
 void set(int eyes, int eyelid, int mouth, int color) {
