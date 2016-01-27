@@ -56,6 +56,7 @@ void loop(){
 }
 
 void set(int eyes, int eyelid, int mouth, int color) {
+  color = color % 360;
   int eyeOp = (eyes > stateEye) ? 1 : -1;
   int lidOp = (eyelid > stateEyelid) ? 1 : -1;
   int mouthOp = (mouth > stateMouth) ? 1 : -1;
