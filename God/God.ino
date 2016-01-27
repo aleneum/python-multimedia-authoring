@@ -1,19 +1,4 @@
-/* Sweep
- by BARRAGAN <http://barraganstudio.com>
- This example code is in the public domain.
-
- modified 8 Nov 2013
- by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Sweep
-*/
-
 #include <Servo.h>
-
-Servo servoMouth;
-Servo servoEyelid;
-Servo servoLeftEye;
-Servo servoRightEye;
-// twelve servo objects can be created on most boards
 
 #define MOUTH A1
 #define EYELID A2
@@ -34,6 +19,11 @@ Servo servoRightEye;
 #define HSV_CYAN 180
 #define HSV_BLUE 240
 #define HSV_CYAN 300
+
+Servo servoMouth;
+Servo servoEyelid;
+Servo servoLeftEye;
+Servo servoRightEye;
 
 int maxLeftEye = 180;
 int minLeftEye = 18;
@@ -71,10 +61,10 @@ void set(int eyes, int eyelid, int mouth, int color) {
   int mouthOp = (mouth > stateMouth) ? 1 : -1;
   int colorOp = (color > stateColor) ? 1 : -1;
  
-  servoRightEye.attach(RIGHT_EYE);
-  servoLeftEye.attach(LEFT_EYE);
-  servoMouth.attach(MOUTH);
-  servoEyelid.attach(EYELID);
+  servoRightEye.attach(RIGHT_EYE, minRightEye, maxRightEye);
+  servoLeftEye.attach(LEFT_EYE, minLeftEye, maxLeftEye);
+  servoMouth.attach(MOUTH, minMouth, maxMouth);
+  servoEyelid.attach(EYELID, minEyelid, maxEyelid);
 
   while((stateEye != eyes) || 
         (stateEyelid != eyelid) || 
