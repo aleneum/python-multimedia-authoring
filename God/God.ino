@@ -34,14 +34,14 @@ int minMouth = 13;
 int maxEyelid = 170;
 int minEyelid = 0;
 
-int stateMouth = 1;   // 0 HAPPY; 180 ANGRY
-int stateEyelid = 1;  // 0 DOWN; 180 UP;
-int stateEye = 1;       // 0 SAD; 180 ANGRY;
-int stateLeftEye = 1;   // 180 ANGRY; 0 SAD;
-int stateRightEye = 1;  // 0 ANGRY; 180 SAD;
+int stateMouth = 89;   // 0 HAPPY; 180 ANGRY
+int stateEyelid = 89;  // 0 DOWN; 180 UP;
+int stateEye = 89;       // 0 SAD; 180 ANGRY;
+int stateLeftEye = 89;   // 180 ANGRY; 0 SAD;
+int stateRightEye = 89;  // 0 ANGRY; 180 SAD;
 
 unsigned char r,g,b;
-int stateColor = 0;
+int stateColor = 90;
 
 void setup() {
   Serial.begin(9600);
