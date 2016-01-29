@@ -9,19 +9,20 @@ import random
 class SocketControl(object):
 
     def __init__(self, connection):
+        global A, B, C
         self.state = [0, 0, 0]
         self.map = [1, 2, 4]
         self.connection_name = connection
         self.port = serial.Serial(connection)
 
     def set_A(self, state):
-        self.set(0, state)
+        self.set(A, state)
 
     def set_B(self, state):
-        self.set(1, state)
+        self.set(B, state)
 
     def set_C(self, state):
-        self.set(2, state)
+        self.set(C, state)
 
     def set(self, idx, state):
         self.state[idx] = 1 if state else 0
@@ -52,6 +53,13 @@ class SoundControl(object):
     def exit(self, time):
         pygame.mixer.fadeout(time)
 
+    def smoke(self):
+        self.lightning.set_A(ON)
+        self.lightning.send()
+        time.sleep(0.3)
+        self.lightning.set_A(OFF)
+        self.lightning.send()
+
     # 0 - 6
     def thunder(self, inc):
         wait = random.randint(0, 2+inc)
@@ -71,7 +79,6 @@ class SoundControl(object):
             time.sleep(wait)
 
         if wait < 6:
-            print "send"
             self.lightning.set_B(OFF)
             self.lightning.send()
         thunder.play()
@@ -84,12 +91,15 @@ class SoundControl(object):
         time.sleep(wait)
 
     def devil(self):
-        self.lightning.set_B(OFF)
+        self.lightning.set_A(ON)
         self.lightning.set_C(ON)
         self.lightning.send()
         poodle = Sound("%s/poodle.wav" % (self._data_folder))
         poodle.play()
-        time.sleep(1)
+        time.sleep(0.3)
+        self.lightning.set_A(OFF)
+        self.lightning.send()
+        time.sleep(0.7)
         for i in range(10):
             wait = random.randint(0, 3)
             while self._last == wait:
@@ -98,6 +108,14 @@ class SoundControl(object):
             self._last = wait
             thunder = Sound("%s/thunder_0%d.wav" % (self._data_folder, wait))
             thunder.play()
+            if wait < 2:
+                off_for = 0.05 + random.random() * 0.3
+                print "flicker for", off_for
+                self.lightning.set_B(OFF)
+                self.lightning.send()
+                time.sleep(off_for)
+                self.lightning.set_B(ON)
+                self.lightning.send()
             time.sleep(2)
         self.lightning.set_C(OFF)
         self.lightning.send()
@@ -105,18 +123,20 @@ class SoundControl(object):
         self.lightning.set_B(ON)
         self.lightning.send()
 
+
+
 # global constants
 FREQ = 44100   # same as audio CD
 BITSIZE = -16  # unsigned 16 bit
 CHANNELS = 2   # 1 == mono, 2 == stereo
 BUFFER = 1024  # audio buffer size in no. of samples
 FRAMERATE = 30 # how often to check if playback has finished
-SERIAL_STRING='/dev/cu.usbmodem1421'
+SERIAL_STRING='/dev/cu.usbmodem1411'
 DATA_FOLDER='data'
 ON = True
 OFF = False
-A = 0
-B = 1
+A = 1
+B = 0
 C = 2
 
 pygame.init()
@@ -133,6 +153,10 @@ while True:
         sound.devil()
     else:
         i = max(min(6, 20 - counter), 3)
+        smoke = random.randint(0, 4)
+        print "smoke: ", smoke
+        if smoke == 0:
+            sound.smoke()
         sound.thunder(i)
     counter += 1
     print "counter: ", counter
